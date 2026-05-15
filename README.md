@@ -1,59 +1,72 @@
-# RestaurantFront
+# Restaurant Reservation — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.11.
+SPA desarrollada en **Angular 19** que consume la API REST del sistema de reservas de restaurante. Se comunica exclusivamente con el `api-gateway` en `http://localhost:8080`.
 
-## Development server
+## Tecnologías
 
-To start a local development server, run:
+- Angular 19
+- TypeScript
+- SCSS
+- Angular Router
+
+## Requisitos previos
+
+- Node.js 18+
+- npm 9+
+- Angular CLI: `npm install -g @angular/cli`
+- Backend corriendo ([restaurant-reservation-apiu](https://github.com/juans.quintoh/restaurant-reservation-apiu))
+
+## Instalación
+
+```bash
+# Clonar el repositorio
+git clone https://github.com/juans.quintoh/restaurant-reservation-front.git
+cd restaurant-reservation-front
+
+# Instalar dependencias
+npm install
+```
+
+## Ejecutar en desarrollo
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Abre el navegador en `http://localhost:4200`.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Build para producción
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Los archivos compilados quedan en `dist/`.
 
-## Running unit tests
+## Estructura del proyecto
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
+```
+src/
+├── app/
+│   ├── core/           # Servicios globales, interceptores, guards
+│   ├── features/       # Módulos por funcionalidad
+│   │   ├── auth/       # Login y registro
+│   │   ├── reservations/
+│   │   ├── tables/
+│   │   └── customers/
+│   ├── shared/         # Componentes y utilidades reutilizables
+│   ├── app.routes.ts
+│   └── app.config.ts
+└── environments/       # Variables de entorno
 ```
 
-## Running end-to-end tests
+## Backend
 
-For end-to-end (e2e) testing, run:
+Este frontend requiere que el backend esté corriendo. Consulta el repositorio [restaurant-reservation-apiu](https://github.com/0xjuans/restaurant-reservation-apiu) para instrucciones de instalación con Docker.
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Servicio | URL |
+|---|---|
+| API Gateway | http://localhost:8080 |
+| Eureka | http://localhost:8761 |
+| MailHog | http://localhost:8025 |
+| pgAdmin | http://localhost:5050 |
