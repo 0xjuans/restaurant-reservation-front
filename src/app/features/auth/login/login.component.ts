@@ -4,11 +4,12 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NavbarComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -41,7 +42,7 @@ export class LoginComponent {
     this.errorMsg.set('');
 
     this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => this.router.navigate(['/reservations']),
+      next: () => this.router.navigate(['/reservaciones']),
       error: (err) => {
         // Muestra mensaje según el código de respuesta del servidor
         this.errorMsg.set(

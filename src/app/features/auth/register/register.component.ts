@@ -11,6 +11,7 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { AuthService } from '../../../core/services/auth.service';
 
 // Validator que verifica que password y confirmPassword sean iguales
@@ -22,7 +23,7 @@ const passwordMatchValidator: ValidatorFn = (group: AbstractControl): Validation
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, NavbarComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
 })
@@ -66,7 +67,7 @@ export class RegisterComponent {
     const { confirmPassword, ...payload } = this.form.getRawValue();
 
     this.auth.register(payload).subscribe({
-      next: () => this.router.navigate(['/reservations']),
+      next: () => this.router.navigate(['/reservaciones']),
       error: (err) => {
         this.errorMsg.set(
           err.status === 409

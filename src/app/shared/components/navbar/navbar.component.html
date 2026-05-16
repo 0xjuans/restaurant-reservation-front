@@ -1,16 +1,16 @@
-<!-- Navbar fijo: transparente en el hero, sólido con sombra al hacer scroll -->
+<!-- Navbar fijo: transparente en el hero, sólido con sombra al hacer scroll o en páginas internas -->
 <nav
   class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
-  [class.bg-cream]="isScrolled()"
-  [class.shadow-md]="isScrolled()"
-  [class.bg-transparent]="!isScrolled()">
+  [class.bg-cream]="isSolid"
+  [class.shadow-md]="isSolid"
+  [class.bg-transparent]="!isSolid">
 
   <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
     <!-- Logo -->
-    <a href="/" class="font-serif text-2xl font-semibold"
-      [class.text-white]="!isScrolled()"
-      [class.text-charcoal]="isScrolled()">
+    <a href="/" class="font-serif text-2xl font-semibold transition-colors duration-300"
+      [class.text-white]="!isSolid"
+      [class.text-charcoal]="isSolid">
       Lumière
     </a>
 
@@ -21,28 +21,94 @@
           <a
             [href]="link.href"
             class="transition-colors duration-300 hover:text-gold"
-            [class.text-white]="!isScrolled()"
-            [class.text-warm-gray]="isScrolled()">
+            [class.text-white]="!isSolid"
+            [class.text-warm-gray]="isSolid">
             {{ link.label }}
           </a>
         </li>
       }
     </ul>
 
-    <!-- Botón reservar — desktop -->
-    <a
-      href="/reservations"
-      class="hidden md:inline-block px-5 py-2 text-sm font-medium tracking-wide
-             border transition-colors duration-300"
-      [class.border-white]="!isScrolled()"
-      [class.text-white]="!isScrolled()"
-      [class.hover:bg-white]="!isScrolled()"
-      [class.border-gold]="isScrolled()"
-      [class.text-gold]="isScrolled()"
-      [class.hover:bg-gold]="isScrolled()"
-      [class.hover:text-white]="isScrolled()">
-      Reservar
-    </a>
+    <!-- Acciones derechas — desktop -->
+    <div class="hidden md:flex items-center gap-3">
+
+      <!-- Carrito (placeholder para futuras funcionalidades) -->
+      <button
+        title="Carrito"
+        class="relative p-2 transition-colors duration-300 hover:text-gold"
+        [class.text-white]="!isSolid"
+        [class.text-warm-gray]="isSolid">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17
+               m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <!-- Badge (sin número por ahora) -->
+        <span class="absolute top-1 right-1 w-2 h-2 bg-gold rounded-full"></span>
+      </button>
+
+      <!-- Sin sesión: botones login / registro -->
+      @if (!auth.isAuthenticated()) {
+        <a routerLink="/acceso"
+          class="px-4 py-2 text-sm font-medium tracking-wide transition-colors duration-300 hover:text-gold"
+          [class.text-white]="!isSolid"
+          [class.text-warm-gray]="isSolid">
+          Iniciar sesión
+        </a>
+        <a routerLink="/registro"
+          class="px-5 py-2 text-sm font-medium tracking-wide border transition-colors duration-300"
+          [class.border-white]="!isSolid"
+          [class.text-white]="!isSolid"
+          [class.hover:bg-white]="!isSolid"
+          [class.hover:text-charcoal]="!isSolid"
+          [class.border-gold]="isSolid"
+          [class.text-gold]="isSolid"
+          [class.hover:bg-gold]="isSolid"
+          [class.hover:text-white]="isSolid">
+          Registrarse
+        </a>
+      }
+
+      <!-- Con sesión: nombre del usuario + dropdown -->
+      @if (auth.isAuthenticated()) {
+        <div class="relative">
+          <button
+            (click)="toggleUserMenu()"
+            class="flex items-center gap-2 px-4 py-2 text-sm font-medium tracking-wide
+                   transition-colors duration-300 hover:text-gold"
+            [class.text-white]="!isSolid"
+            [class.text-warm-gray]="isSolid">
+            <!-- Icono usuario -->
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            {{ auth.currentUser()?.email }}
+            <svg class="w-3 h-3 transition-transform duration-200"
+              [class.rotate-180]="isUserMenuOpen()"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          <!-- Dropdown -->
+          @if (isUserMenuOpen()) {
+            <div class="absolute right-0 mt-2 w-44 bg-white shadow-lg border border-gray-100 py-1 z-50">
+              <a href="/reservaciones"
+                class="block px-4 py-2 text-sm text-warm-gray hover:text-gold hover:bg-cream transition-colors">
+                Mis reservas
+              </a>
+              <div class="border-t border-gray-100 my-1"></div>
+              <button (click)="logout()"
+                class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors">
+                Cerrar sesión
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+    </div>
 
     <!-- Botón hamburguesa — móvil -->
     <button
@@ -50,35 +116,66 @@
       (click)="toggleMenu()"
       aria-label="Abrir menú">
       <span class="block w-6 h-0.5 transition-colors duration-300"
-        [class.bg-white]="!isScrolled()"
-        [class.bg-charcoal]="isScrolled()"></span>
+        [class.bg-white]="!isSolid"
+        [class.bg-charcoal]="isSolid"></span>
       <span class="block w-6 h-0.5 transition-colors duration-300"
-        [class.bg-white]="!isScrolled()"
-        [class.bg-charcoal]="isScrolled()"></span>
+        [class.bg-white]="!isSolid"
+        [class.bg-charcoal]="isSolid"></span>
       <span class="block w-6 h-0.5 transition-colors duration-300"
-        [class.bg-white]="!isScrolled()"
-        [class.bg-charcoal]="isScrolled()"></span>
+        [class.bg-white]="!isSolid"
+        [class.bg-charcoal]="isSolid"></span>
     </button>
   </div>
 
   <!-- Menú móvil desplegable -->
   @if (isMenuOpen()) {
     <div class="md:hidden bg-cream px-6 py-4 flex flex-col gap-4 shadow-md">
+
       @for (link of navLinks; track link.label) {
-        <a
-          [href]="link.href"
+        <a [href]="link.href"
           class="text-warm-gray hover:text-gold text-sm font-medium tracking-wide transition-colors"
           (click)="closeMenu()">
           {{ link.label }}
         </a>
       }
-      <a
-        href="/reservations"
-        class="mt-2 px-5 py-2 text-sm font-medium text-center border border-gold text-gold
-               hover:bg-gold hover:text-white transition-colors duration-300"
-        (click)="closeMenu()">
-        Reservar
-      </a>
+
+      <div class="border-t border-gray-200 pt-4 flex flex-col gap-3">
+
+        <!-- Carrito móvil -->
+        <a href="#" class="flex items-center gap-2 text-warm-gray hover:text-gold text-sm transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17
+                 m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          Carrito
+        </a>
+
+        @if (!auth.isAuthenticated()) {
+          <a routerLink="/acceso" (click)="closeMenu()"
+            class="text-warm-gray hover:text-gold text-sm font-medium tracking-wide transition-colors">
+            Iniciar sesión
+          </a>
+          <a routerLink="/registro" (click)="closeMenu()"
+            class="px-5 py-2 text-sm font-medium text-center border border-gold text-gold
+                   hover:bg-gold hover:text-white transition-colors duration-300">
+            Registrarse
+          </a>
+        }
+
+        @if (auth.isAuthenticated()) {
+          <p class="text-xs text-warm-gray">{{ auth.currentUser()?.email }}</p>
+          <a href="/reservaciones" (click)="closeMenu()"
+            class="text-warm-gray hover:text-gold text-sm font-medium tracking-wide transition-colors">
+            Mis reservas
+          </a>
+          <button (click)="logout()"
+            class="text-left text-sm text-red-500 font-medium hover:text-red-700 transition-colors">
+            Cerrar sesión
+          </button>
+        }
+
+      </div>
     </div>
   }
 

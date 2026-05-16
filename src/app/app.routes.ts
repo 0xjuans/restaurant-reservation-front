@@ -27,7 +27,12 @@ export const routes: Routes = [
   },
 
   // Rutas privadas — redirige a /acceso si no hay sesión
-  // (aquí irán reservaciones, mi-cuenta, etc.)
+  {
+    path: 'reservaciones',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/reservations/reservations.component').then(m => m.ReservationsComponent),
+  },
 
   {
     path: '**',

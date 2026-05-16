@@ -1,0 +1,340 @@
+<!-- Página de reservaciones -->
+<app-navbar [solid]="true" />
+
+<main class="min-h-screen bg-cream pt-24 pb-16 px-6">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Encabezado -->
+    <div class="mb-10">
+      <span class="text-gold uppercase tracking-widest text-xs font-medium">Tu experiencia</span>
+      <h1 class="font-serif text-4xl text-charcoal mt-2">Mis Reservaciones</h1>
+      <div class="w-10 h-0.5 bg-gold mt-4"></div>
+    </div>
+
+    <!-- ── CARGANDO PERFIL ─────────────────────────────────────── -->
+    @if (loadingProfile()) {
+      <div class="flex items-center justify-center py-24">
+        <svg class="w-8 h-8 animate-spin text-gold" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+      </div>
+    }
+
+    <!-- ── SIN PERFIL — formulario de creación ────────────────── -->
+    @if (!loadingProfile() && !customer()) {
+      <div class="bg-white shadow-sm p-8 max-w-lg mx-auto">
+        <h2 class="font-serif text-2xl text-charcoal mb-2">Completa tu perfil</h2>
+        <p class="text-warm-gray text-sm mb-6">
+          Necesitamos algunos datos antes de hacer tu primera reserva.
+        </p>
+
+        @if (profileError()) {
+          <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm">
+            {{ profileError() }}
+          </div>
+        }
+
+        <form [formGroup]="profileForm" (ngSubmit)="submitProfile()" class="space-y-4">
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">Nombre</label>
+              <input type="text" formControlName="firstName" placeholder="Juan"
+                class="w-full px-4 py-3 bg-cream border border-gray-200 text-charcoal text-sm
+                       focus:outline-none focus:border-gold transition-colors"
+                [class.border-red-400]="profileForm.controls.firstName.invalid && profileForm.controls.firstName.touched"/>
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">Apellido</label>
+              <input type="text" formControlName="lastName" placeholder="Pérez"
+                class="w-full px-4 py-3 bg-cream border border-gray-200 text-charcoal text-sm
+                       focus:outline-none focus:border-gold transition-colors"
+                [class.border-red-400]="profileForm.controls.lastName.invalid && profileForm.controls.lastName.touched"/>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">Teléfono</label>
+            <input type="tel" formControlName="phone" placeholder="+57 300 123 4567"
+              class="w-full px-4 py-3 bg-cream border border-gray-200 text-charcoal text-sm
+                     focus:outline-none focus:border-gold transition-colors"
+              [class.border-red-400]="profileForm.controls.phone.invalid && profileForm.controls.phone.touched"/>
+          </div>
+
+          <button type="submit" [disabled]="savingProfile()"
+            class="w-full py-3 bg-gold text-white text-sm font-medium tracking-widest uppercase
+                   hover:bg-gold-dark transition-colors disabled:opacity-60">
+            {{ savingProfile() ? 'Guardando...' : 'Guardar perfil' }}
+          </button>
+
+        </form>
+      </div>
+    }
+
+    <!-- ── CON PERFIL ─────────────────────────────────────────── -->
+    @if (!loadingProfile() && customer()) {
+
+      <!-- Saludo + botón cerrar sesión -->
+      <div class="flex items-center justify-between mb-8">
+        <p class="text-warm-gray text-sm">
+          Hola, <span class="text-charcoal font-medium">{{ customer()!.firstName }} {{ customer()!.lastName }}</span>
+        </p>
+        <button (click)="logout()"
+          class="text-xs text-warm-gray hover:text-charcoal tracking-wide transition-colors">
+          Cerrar sesión →
+        </button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-0 border-b border-gray-200 mb-8">
+        <button
+          (click)="activeTab.set('nueva')"
+          class="px-6 py-3 text-sm font-medium tracking-wide transition-colors border-b-2 -mb-px"
+          [class.border-gold]="activeTab() === 'nueva'"
+          [class.text-gold]="activeTab() === 'nueva'"
+          [class.border-transparent]="activeTab() !== 'nueva'"
+          [class.text-warm-gray]="activeTab() !== 'nueva'">
+          Nueva reserva
+        </button>
+        <button
+          (click)="activeTab.set('historial')"
+          class="px-6 py-3 text-sm font-medium tracking-wide transition-colors border-b-2 -mb-px"
+          [class.border-gold]="activeTab() === 'historial'"
+          [class.text-gold]="activeTab() === 'historial'"
+          [class.border-transparent]="activeTab() !== 'historial'"
+          [class.text-warm-gray]="activeTab() !== 'historial'">
+          Mis reservas
+          @if (reservations().length > 0) {
+            <span class="ml-2 px-2 py-0.5 bg-gold text-white text-xs rounded-full">
+              {{ reservations().length }}
+            </span>
+          }
+        </button>
+      </div>
+
+      <!-- ── TAB: NUEVA RESERVA ──────────────────────────────── -->
+      @if (activeTab() === 'nueva') {
+        <div class="bg-white shadow-sm p-8">
+
+          @if (reservSuccess()) {
+            <div class="mb-6 px-4 py-4 bg-green-50 border border-green-200 text-green-700 text-sm">
+              ✓ ¡Reserva creada exitosamente! Recibirás una confirmación pronto.
+            </div>
+          }
+
+          @if (reservError()) {
+            <div class="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm">
+              {{ reservError() }}
+            </div>
+          }
+
+          <form [formGroup]="reservForm" (ngSubmit)="submitReservation()" class="space-y-6">
+
+            <!-- Fila: Fecha + Número de personas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+                  Fecha
+                </label>
+                <input type="date" formControlName="date" [min]="minDate"
+                  class="w-full px-4 py-3 bg-cream border text-charcoal text-sm
+                         focus:outline-none focus:border-gold transition-colors"
+                  [class.border-red-400]="reservForm.controls.date.invalid && reservForm.controls.date.touched"
+                  [class.border-gray-200]="!(reservForm.controls.date.invalid && reservForm.controls.date.touched)"/>
+              </div>
+
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+                  Número de personas
+                </label>
+                <div class="flex gap-2">
+                  <input type="number" formControlName="guestsCount" min="1" max="20"
+                    class="flex-1 px-4 py-3 bg-cream border border-gray-200 text-charcoal text-sm
+                           focus:outline-none focus:border-gold transition-colors"/>
+                  <!-- Botón buscar mesas -->
+                  <button type="button" (click)="searchTables()"
+                    [disabled]="loadingTables()"
+                    class="px-4 py-3 bg-charcoal text-white text-xs font-medium tracking-wide
+                           hover:bg-gold transition-colors disabled:opacity-60 whitespace-nowrap">
+                    {{ loadingTables() ? '...' : 'Buscar mesas' }}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Selector de mesa -->
+            @if (tablesLoaded()) {
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+                  Mesa disponible
+                </label>
+
+                @if (availableTables().length === 0) {
+                  <p class="text-warm-gray text-sm py-3">
+                    No hay mesas disponibles para {{ reservForm.controls.guestsCount.value }} personas.
+                    Prueba con un número diferente.
+                  </p>
+                } @else {
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    @for (table of availableTables(); track table.id) {
+                      <button type="button"
+                        (click)="reservForm.controls.tableId.setValue(table.id)"
+                        class="p-4 border text-left transition-all duration-200"
+                        [class.border-gold]="reservForm.controls.tableId.value === table.id"
+                        [class.bg-gold]="reservForm.controls.tableId.value === table.id"
+                        [class.text-white]="reservForm.controls.tableId.value === table.id"
+                        [class.border-gray-200]="reservForm.controls.tableId.value !== table.id"
+                        [class.hover:border-gold]="reservForm.controls.tableId.value !== table.id">
+                        <p class="font-serif text-lg font-semibold">Mesa {{ table.number }}</p>
+                        <p class="text-xs mt-1 opacity-75">{{ table.zoneName }}</p>
+                        <p class="text-xs opacity-75">Hasta {{ table.capacity }} personas</p>
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Fila: Hora inicio + Hora fin -->
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+                  Hora de llegada
+                </label>
+                <input type="time" formControlName="startTime"
+                  class="w-full px-4 py-3 bg-cream border text-charcoal text-sm
+                         focus:outline-none focus:border-gold transition-colors"
+                  [class.border-red-400]="reservForm.controls.startTime.invalid && reservForm.controls.startTime.touched"
+                  [class.border-gray-200]="!(reservForm.controls.startTime.invalid && reservForm.controls.startTime.touched)"/>
+              </div>
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+                  Hora de salida
+                </label>
+                <input type="time" formControlName="endTime"
+                  class="w-full px-4 py-3 bg-cream border text-charcoal text-sm
+                         focus:outline-none focus:border-gold transition-colors"
+                  [class.border-red-400]="reservForm.controls.endTime.invalid && reservForm.controls.endTime.touched"
+                  [class.border-gray-200]="!(reservForm.controls.endTime.invalid && reservForm.controls.endTime.touched)"/>
+              </div>
+            </div>
+
+            <!-- Notas -->
+            <div>
+              <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+                Notas especiales <span class="normal-case text-warm-gray">(opcional)</span>
+              </label>
+              <textarea formControlName="notes" rows="3"
+                placeholder="Ej: mesa con vista al jardín, celebración de cumpleaños, alergias..."
+                class="w-full px-4 py-3 bg-cream border border-gray-200 text-charcoal text-sm
+                       focus:outline-none focus:border-gold transition-colors resize-none
+                       placeholder:text-warm-gray placeholder:text-opacity-60">
+              </textarea>
+            </div>
+
+            <!-- Botón submit -->
+            <button type="submit" [disabled]="savingReserv()"
+              class="w-full py-4 bg-gold text-white text-sm font-medium tracking-widest uppercase
+                     hover:bg-gold-dark transition-colors disabled:opacity-60">
+              @if (savingReserv()) {
+                <span class="flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                  </svg>
+                  Reservando...
+                </span>
+              } @else {
+                Confirmar reserva
+              }
+            </button>
+
+          </form>
+        </div>
+      }
+
+      <!-- ── TAB: HISTORIAL ──────────────────────────────────── -->
+      @if (activeTab() === 'historial') {
+        <div>
+          @if (loadingReservations()) {
+            <div class="flex justify-center py-12">
+              <svg class="w-6 h-6 animate-spin text-gold" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+            </div>
+          } @else if (reservations().length === 0) {
+            <div class="text-center py-16 text-warm-gray">
+              <p class="font-serif text-xl mb-2">Aún no tienes reservas</p>
+              <p class="text-sm">Ve a la pestaña "Nueva reserva" para comenzar.</p>
+            </div>
+          } @else {
+            <div class="space-y-4">
+              @for (r of reservations(); track r.id) {
+                <div class="bg-white shadow-sm p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+                  <!-- Info principal -->
+                  <div>
+                    <div class="flex items-center gap-3 mb-2">
+                      <span class="font-serif text-lg text-charcoal">
+                        Mesa {{ r.tableNumber }} — {{ r.tableZoneName }}
+                      </span>
+                      <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ statusClass(r.status) }}">
+                        {{ statusLabel(r.status) }}
+                      </span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-4 mt-1 text-sm text-warm-gray">
+                      <!-- Fecha -->
+                      <span class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        {{ r.date }}
+                      </span>
+                      <!-- Horario -->
+                      <span class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {{ r.startTime }} – {{ r.endTime }}
+                      </span>
+                      <!-- Personas -->
+                      <span class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857
+                               M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857
+                               m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        {{ r.guestsCount }} {{ r.guestsCount === 1 ? 'persona' : 'personas' }}
+                      </span>
+                    </div>
+                    @if (r.notes) {
+                      <p class="text-xs text-warm-gray mt-1 italic">"{{ r.notes }}"</p>
+                    }
+                  </div>
+
+                  <!-- Acción cancelar -->
+                  @if (r.status === 'PENDING' || r.status === 'CONFIRMED') {
+                    <button (click)="cancelReservation(r.id)"
+                      class="text-xs text-red-500 hover:text-red-700 border border-red-200
+                             hover:border-red-400 px-4 py-2 transition-colors whitespace-nowrap">
+                      Cancelar
+                    </button>
+                  }
+
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+    }
+  </div>
+</main>
