@@ -1,0 +1,152 @@
+<!-- Gestión de mesas — panel admin -->
+<div class="p-8">
+
+  <!-- Encabezado -->
+  <div class="mb-8 flex items-end justify-between">
+    <div>
+      <span class="text-gold uppercase tracking-widest text-xs font-medium">Administración</span>
+      <h1 class="font-serif text-3xl text-charcoal mt-1">Mesas</h1>
+    </div>
+    <button (click)="openCreate()"
+      class="flex items-center gap-2 px-5 py-2.5 bg-gold text-white text-sm font-medium
+             tracking-wide hover:bg-gold-dark transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nueva mesa
+    </button>
+  </div>
+
+  <!-- Panel formulario (slide-in) -->
+  @if (showForm()) {
+    <div class="bg-white shadow-sm border border-gray-100 p-6 mb-6">
+      <h2 class="font-serif text-lg text-charcoal mb-5">
+        {{ editingId() ? 'Editar mesa' : 'Nueva mesa' }}
+      </h2>
+
+      @if (errorMsg()) {
+        <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm">
+          {{ errorMsg() }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        <!-- Zona -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">Zona</label>
+          <select formControlName="zoneId"
+            class="w-full px-4 py-3 bg-cream border border-gray-200 text-charcoal text-sm
+                   focus:outline-none focus:border-gold transition-colors">
+            @for (zone of zones; track zone.id) {
+              <option [value]="zone.id">{{ zone.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Número de mesa -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">N° Mesa</label>
+          <input type="number" formControlName="number" min="1"
+            class="w-full px-4 py-3 bg-cream border text-charcoal text-sm
+                   focus:outline-none focus:border-gold transition-colors"
+            [class.border-red-400]="form.controls.number.invalid && form.controls.number.touched"
+            [class.border-gray-200]="!(form.controls.number.invalid && form.controls.number.touched)"/>
+        </div>
+
+        <!-- Capacidad -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">Capacidad</label>
+          <input type="number" formControlName="capacity" min="1"
+            class="w-full px-4 py-3 bg-cream border text-charcoal text-sm
+                   focus:outline-none focus:border-gold transition-colors"
+            [class.border-red-400]="form.controls.capacity.invalid && form.controls.capacity.touched"
+            [class.border-gray-200]="!(form.controls.capacity.invalid && form.controls.capacity.touched)"/>
+        </div>
+
+        <!-- Acciones -->
+        <div class="sm:col-span-3 flex gap-3 pt-2">
+          <button type="submit" [disabled]="isSaving()"
+            class="px-6 py-2.5 bg-gold text-white text-sm font-medium tracking-wide
+                   hover:bg-gold-dark transition-colors disabled:opacity-60">
+            {{ isSaving() ? 'Guardando...' : (editingId() ? 'Actualizar' : 'Crear mesa') }}
+          </button>
+          <button type="button" (click)="closeForm()"
+            class="px-6 py-2.5 border border-gray-300 text-warm-gray text-sm
+                   hover:border-charcoal hover:text-charcoal transition-colors">
+            Cancelar
+          </button>
+        </div>
+
+      </form>
+    </div>
+  }
+
+  <!-- Tabla de mesas -->
+  @if (isLoading()) {
+    <div class="flex justify-center py-24">
+      <svg class="w-8 h-8 animate-spin text-gold" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+    </div>
+  } @else {
+    <div class="bg-white shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100 bg-cream">
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Mesa</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Zona</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Capacidad</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Estado</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Cambiar estado</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (table of tables(); track table.id) {
+              <tr class="border-b border-gray-50 hover:bg-cream transition-colors"
+                [class.opacity-50]="updatingId() === table.id">
+                <td class="px-6 py-4 font-serif text-charcoal font-medium">Mesa {{ table.number }}</td>
+                <td class="px-6 py-4 text-warm-gray">{{ table.zoneName }}</td>
+                <td class="px-6 py-4 text-warm-gray text-center">{{ table.capacity }} personas</td>
+                <td class="px-6 py-4">
+                  <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ statusClass(table.status) }}">
+                    {{ statusLabel(table.status) }}
+                  </span>
+                </td>
+                <!-- Selector de estado rápido -->
+                <td class="px-6 py-4">
+                  <select
+                    [value]="table.status"
+                    (change)="changeStatus(table.id, $any($event.target).value)"
+                    class="px-3 py-1.5 border border-gray-200 text-charcoal text-xs
+                           focus:outline-none focus:border-gold bg-white transition-colors">
+                    @for (opt of statusOptions; track opt.value) {
+                      <option [value]="opt.value">{{ opt.label }}</option>
+                    }
+                  </select>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex gap-2">
+                    <button (click)="openEdit(table)"
+                      class="px-3 py-1 text-xs border border-gray-200 text-warm-gray
+                             hover:border-gold hover:text-gold transition-colors">
+                      Editar
+                    </button>
+                    <button (click)="delete(table.id)"
+                      class="px-3 py-1 text-xs border border-red-200 text-red-400
+                             hover:bg-red-50 transition-colors">
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>
