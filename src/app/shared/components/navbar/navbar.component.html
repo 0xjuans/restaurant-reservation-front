@@ -94,6 +94,10 @@
           <!-- Dropdown -->
           @if (isUserMenuOpen()) {
             <div class="absolute right-0 mt-2 w-44 bg-white shadow-lg border border-gray-100 py-1 z-50">
+              <a href="/perfil"
+                class="block px-4 py-2 text-sm text-warm-gray hover:text-gold hover:bg-cream transition-colors">
+                Mi perfil
+              </a>
               <a href="/reservaciones"
                 class="block px-4 py-2 text-sm text-warm-gray hover:text-gold hover:bg-cream transition-colors">
                 Mis reservas
@@ -165,6 +169,10 @@
 
         @if (auth.isAuthenticated()) {
           <p class="text-xs text-warm-gray">{{ auth.currentUser()?.email }}</p>
+          <a href="/perfil" (click)="closeMenu()"
+            class="text-warm-gray hover:text-gold text-sm font-medium tracking-wide transition-colors">
+            Mi perfil
+          </a>
           <a href="/reservaciones" (click)="closeMenu()"
             class="text-warm-gray hover:text-gold text-sm font-medium tracking-wide transition-colors">
             Mis reservas
