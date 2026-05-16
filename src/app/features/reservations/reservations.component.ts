@@ -5,14 +5,15 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, EMPTY, switchMap } from 'rxjs';
 
-import { NavbarComponent }      from '../../shared/components/navbar/navbar.component';
-import { CustomerService }      from '../../core/services/customer.service';
-import { TableService }         from '../../core/services/table.service';
-import { ReservationService }   from '../../core/services/reservation.service';
-import { AuthService }          from '../../core/services/auth.service';
-import { CustomerResponse }     from '../../core/models/customer.model';
-import { TableResponse }        from '../../core/models/table.model';
-import { ReservationResponse }  from '../../core/models/reservation.model';
+import { NavbarComponent }        from '../../shared/components/navbar/navbar.component';
+import { CustomerService }        from '../../core/services/customer.service';
+import { TableService }           from '../../core/services/table.service';
+import { ReservationService }     from '../../core/services/reservation.service';
+import { AuthService }            from '../../core/services/auth.service';
+import { NotificationService }    from '../../core/services/notification.service';
+import { CustomerResponse }       from '../../core/models/customer.model';
+import { TableResponse }          from '../../core/models/table.model';
+import { ReservationResponse }    from '../../core/models/reservation.model';
 
 @Component({
   selector: 'app-reservations',
@@ -27,6 +28,7 @@ export class ReservationsComponent implements OnInit {
   private readonly tableSvc    = inject(TableService);
   private readonly reservSvc   = inject(ReservationService);
   private readonly auth        = inject(AuthService);
+  private readonly notif       = inject(NotificationService);
   private readonly router      = inject(Router);
 
   // Estado del perfil del cliente
@@ -46,8 +48,6 @@ export class ReservationsComponent implements OnInit {
   savingProfile  = signal(false);
   savingReserv   = signal(false);
   profileError   = signal('');
-  reservError    = signal('');
-  reservSuccess  = signal(false);
 
   // Vista activa: 'nueva' | 'historial'
   activeTab = signal<'nueva' | 'historial'>('nueva');
@@ -59,13 +59,22 @@ export class ReservationsComponent implements OnInit {
     phone:     ['', [Validators.required, Validators.pattern(/^\+?[0-9\s\-]{7,15}$/)]],
   });
 
-  // Formulario de nueva reserva
+  // Opciones de duración disponibles para la reserva
+  readonly durationOptions = [
+    { value: 60,  label: '1 hora'         },
+    { value: 90,  label: '1 hora 30 min'  },
+    { value: 120, label: '2 horas'        },
+    { value: 150, label: '2 horas 30 min' },
+    { value: 180, label: '3 horas'        },
+  ];
+
+  // Formulario de nueva reserva — endTime se calcula a partir de startTime + duration
   readonly reservForm = this.fb.nonNullable.group({
     date:        ['', Validators.required],
     guestsCount: [1, [Validators.required, Validators.min(1), Validators.max(20)]],
     tableId:     [0, [Validators.required, Validators.min(1)]],
     startTime:   ['', Validators.required],
-    endTime:     ['', Validators.required],
+    duration:    [60, Validators.required],
     notes:       [''],
   });
 
@@ -144,8 +153,6 @@ export class ReservationsComponent implements OnInit {
     }
 
     this.savingReserv.set(true);
-    this.reservError.set('');
-    this.reservSuccess.set(false);
 
     const f = this.reservForm.getRawValue();
 
@@ -153,22 +160,21 @@ export class ReservationsComponent implements OnInit {
       customerId:  this.customer()!.id,
       tableId:     f.tableId,
       date:        f.date,
-      startTime:   f.startTime,
-      endTime:     f.endTime,
+      startTime:   f.startTime + ':00',
+      endTime:     this.calcEndTime(f.startTime, f.duration),
       guestsCount: f.guestsCount,
       notes:       f.notes,
     }).subscribe({
-      next: (res) => {
-        this.reservSuccess.set(true);
+      next: () => {
+        this.notif.success('Reserva creada. Recibirás una confirmación pronto.');
         this.savingReserv.set(false);
-        this.reservForm.reset({ guestsCount: 1, tableId: 0 });
+        this.reservForm.reset({ guestsCount: 1, tableId: 0, duration: 60 });
         this.availableTables.set([]);
         this.tablesLoaded.set(false);
-        // Recarga el historial con la nueva reserva
         this.loadReservations(this.customer()!.id);
       },
       error: (err) => {
-        this.reservError.set(
+        this.notif.error(
           err.status === 409
             ? 'La mesa no está disponible en ese horario. Elige otro.'
             : 'No se pudo crear la reserva. Inténtalo de nuevo.'
@@ -193,7 +199,11 @@ export class ReservationsComponent implements OnInit {
 
   cancelReservation(id: number): void {
     this.reservSvc.cancel(id).subscribe({
-      next: () => this.loadReservations(this.customer()!.id),
+      next: () => {
+        this.notif.info('Reserva cancelada correctamente.');
+        this.loadReservations(this.customer()!.id);
+      },
+      error: () => this.notif.error('No se pudo cancelar la reserva.'),
     });
   }
 
@@ -218,6 +228,22 @@ export class ReservationsComponent implements OnInit {
       COMPLETED: 'bg-gray-100 text-gray-600',
     };
     return map[status] ?? '';
+  }
+
+  // Hora de salida calculada para mostrar en pantalla
+  get endTimeDisplay(): string {
+    const { startTime, duration } = this.reservForm.getRawValue();
+    if (!startTime) return '--:--';
+    return this.calcEndTime(startTime, duration).slice(0, 5);
+  }
+
+  // Suma los minutos de duración a la hora de inicio y devuelve "HH:mm:ss"
+  private calcEndTime(startTime: string, durationMin: number): string {
+    const [h, m] = startTime.split(':').map(Number);
+    const totalMin = h * 60 + m + durationMin;
+    const endH = Math.floor(totalMin / 60) % 24;
+    const endM = totalMin % 60;
+    return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}:00`;
   }
 
   logout(): void {

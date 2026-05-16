@@ -3,10 +3,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { NavbarComponent }    from '../../shared/components/navbar/navbar.component';
-import { CustomerService }    from '../../core/services/customer.service';
-import { AuthService }        from '../../core/services/auth.service';
-import { CustomerResponse }   from '../../core/models/customer.model';
+import { NavbarComponent }       from '../../shared/components/navbar/navbar.component';
+import { CustomerService }       from '../../core/services/customer.service';
+import { AuthService }           from '../../core/services/auth.service';
+import { NotificationService }   from '../../core/services/notification.service';
+import { CustomerResponse }      from '../../core/models/customer.model';
 
 @Component({
   selector: 'app-profile',
@@ -18,14 +19,13 @@ export class ProfileComponent implements OnInit {
 
   private readonly fb          = inject(FormBuilder);
   private readonly customerSvc = inject(CustomerService);
+  private readonly notif       = inject(NotificationService);
   readonly auth                = inject(AuthService);
 
   customer     = signal<CustomerResponse | null>(null);
   isLoading    = signal(true);
   isSaving     = signal(false);
   isEditing    = signal(false);
-  successMsg   = signal('');
-  errorMsg     = signal('');
 
   readonly form = this.fb.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -50,8 +50,6 @@ export class ProfileComponent implements OnInit {
 
   // Activa el modo edición
   startEditing(): void {
-    this.successMsg.set('');
-    this.errorMsg.set('');
     this.isEditing.set(true);
   }
 
@@ -59,25 +57,22 @@ export class ProfileComponent implements OnInit {
     const profile = this.customer();
     if (profile) this.fillForm(profile);
     this.isEditing.set(false);
-    this.errorMsg.set('');
   }
 
   onSubmit(): void {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
     this.isSaving.set(true);
-    this.successMsg.set('');
-    this.errorMsg.set('');
 
     this.customerSvc.updateProfile(this.form.getRawValue()).subscribe({
       next: (updated) => {
         this.customer.set(updated);
         this.isEditing.set(false);
         this.isSaving.set(false);
-        this.successMsg.set('Perfil actualizado correctamente.');
+        this.notif.success('Perfil actualizado correctamente.');
       },
       error: () => {
-        this.errorMsg.set('No se pudo actualizar el perfil. Inténtalo de nuevo.');
+        this.notif.error('No se pudo actualizar el perfil. Inténtalo de nuevo.');
         this.isSaving.set(false);
       },
     });

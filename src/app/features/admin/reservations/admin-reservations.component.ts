@@ -3,8 +3,9 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { ReservationService }  from '../../../core/services/reservation.service';
+import { ReservationService }   from '../../../core/services/reservation.service';
 import { ReservationResponse, ReservationStatus } from '../../../core/models/reservation.model';
+import { NotificationService }  from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-admin-reservations',
@@ -14,6 +15,7 @@ import { ReservationResponse, ReservationStatus } from '../../../core/models/res
 export class AdminReservationsComponent implements OnInit {
 
   private readonly reservSvc = inject(ReservationService);
+  private readonly notif     = inject(NotificationService);
 
   isLoading   = signal(true);
   allReservations = signal<ReservationResponse[]>([]);
@@ -57,13 +59,16 @@ export class AdminReservationsComponent implements OnInit {
     this.updatingId.set(id);
     this.reservSvc.updateStatus(id, status).subscribe({
       next: (updated) => {
-        // Actualiza solo la reserva modificada sin recargar todo
         this.allReservations.update(list =>
           list.map(r => r.id === id ? updated : r)
         );
         this.updatingId.set(null);
+        this.notif.success(`Reserva ${this.statusLabel(status).toLowerCase()} correctamente.`);
       },
-      error: () => this.updatingId.set(null),
+      error: () => {
+        this.updatingId.set(null);
+        this.notif.error('No se pudo actualizar el estado de la reserva.');
+      },
     });
   }
 

@@ -3,8 +3,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { TableService } from '../../../core/services/table.service';
-import { TableResponse } from '../../../core/models/table.model';
+import { TableService }        from '../../../core/services/table.service';
+import { TableResponse }        from '../../../core/models/table.model';
+import { NotificationService }  from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-admin-tables',
@@ -15,6 +16,7 @@ export class AdminTablesComponent implements OnInit {
 
   private readonly fb       = inject(FormBuilder);
   private readonly tableSvc = inject(TableService);
+  private readonly notif    = inject(NotificationService);
 
   isLoading   = signal(true);
   tables      = signal<TableResponse[]>([]);
@@ -89,9 +91,15 @@ export class AdminTablesComponent implements OnInit {
       : this.tableSvc.create(payload);
 
     request$.subscribe({
-      next: () => { this.showForm.set(false); this.isSaving.set(false); this.load(); },
+      next: () => {
+        this.notif.success(id ? 'Mesa actualizada correctamente.' : 'Mesa creada correctamente.');
+        this.showForm.set(false);
+        this.isSaving.set(false);
+        this.load();
+      },
       error: (err) => {
         this.errorMsg.set(err.status === 409 ? 'Ya existe esa mesa en la zona.' : 'Error al guardar.');
+        this.notif.error(err.status === 409 ? 'Ya existe esa mesa en la zona.' : 'Error al guardar la mesa.');
         this.isSaving.set(false);
       },
     });
@@ -110,7 +118,10 @@ export class AdminTablesComponent implements OnInit {
 
   delete(id: number): void {
     if (!confirm('¿Eliminar esta mesa? Esta acción no se puede deshacer.')) return;
-    this.tableSvc.delete(id).subscribe({ next: () => this.load() });
+    this.tableSvc.delete(id).subscribe({
+      next: () => { this.notif.success('Mesa eliminada.'); this.load(); },
+      error: () => this.notif.error('No se pudo eliminar la mesa.'),
+    });
   }
 
   statusClass(status: string): string {

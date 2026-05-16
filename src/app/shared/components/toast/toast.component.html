@@ -1,0 +1,33 @@
+<!-- Contenedor de toasts — posición fija en la esquina superior derecha -->
+<div class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 w-80 pointer-events-none">
+
+  @for (toast of notif.toasts(); track toast.id) {
+    <div
+      class="flex items-start gap-3 bg-white shadow-lg border-l-4 px-4 py-3
+             pointer-events-auto transition-all duration-300"
+      [class]="borderClass(toast.type)">
+
+      <!-- Icono de tipo -->
+      <svg class="w-5 h-5 mt-0.5 shrink-0" [class]="iconClass(toast.type)"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          [attr.d]="iconPath(toast.type)"/>
+      </svg>
+
+      <!-- Mensaje -->
+      <p class="flex-1 text-sm text-charcoal leading-snug">{{ toast.message }}</p>
+
+      <!-- Botón cerrar -->
+      <button
+        (click)="notif.dismiss(toast.id)"
+        class="shrink-0 text-warm-gray hover:text-charcoal transition-colors mt-0.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+    </div>
+  }
+
+</div>

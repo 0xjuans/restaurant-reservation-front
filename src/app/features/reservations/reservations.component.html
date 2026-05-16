@@ -117,18 +117,6 @@
       @if (activeTab() === 'nueva') {
         <div class="bg-white shadow-sm p-8">
 
-          @if (reservSuccess()) {
-            <div class="mb-6 px-4 py-4 bg-green-50 border border-green-200 text-green-700 text-sm">
-              ✓ ¡Reserva creada exitosamente! Recibirás una confirmación pronto.
-            </div>
-          }
-
-          @if (reservError()) {
-            <div class="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm">
-              {{ reservError() }}
-            </div>
-          }
-
           <form [formGroup]="reservForm" (ngSubmit)="submitReservation()" class="space-y-6">
 
             <!-- Fila: Fecha + Número de personas -->
@@ -198,8 +186,8 @@
               </div>
             }
 
-            <!-- Fila: Hora inicio + Hora fin -->
-            <div class="grid grid-cols-2 gap-6">
+            <!-- Fila: Hora inicio + Duración + Hora calculada de salida -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div>
                 <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
                   Hora de llegada
@@ -210,16 +198,31 @@
                   [class.border-red-400]="reservForm.controls.startTime.invalid && reservForm.controls.startTime.touched"
                   [class.border-gray-200]="!(reservForm.controls.startTime.invalid && reservForm.controls.startTime.touched)"/>
               </div>
+
+              <!-- Selector de duración — calcula endTime automáticamente -->
+              <div>
+                <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+                  Duración
+                </label>
+                <select formControlName="duration"
+                  class="w-full px-4 py-3 bg-cream border border-gray-200 text-charcoal text-sm
+                         focus:outline-none focus:border-gold transition-colors">
+                  @for (opt of durationOptions; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Hora de salida calculada (solo lectura) -->
               <div>
                 <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
                   Hora de salida
                 </label>
-                <input type="time" formControlName="endTime"
-                  class="w-full px-4 py-3 bg-cream border text-charcoal text-sm
-                         focus:outline-none focus:border-gold transition-colors"
-                  [class.border-red-400]="reservForm.controls.endTime.invalid && reservForm.controls.endTime.touched"
-                  [class.border-gray-200]="!(reservForm.controls.endTime.invalid && reservForm.controls.endTime.touched)"/>
+                <div class="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-charcoal text-sm">
+                  {{ endTimeDisplay }}
+                </div>
               </div>
+
             </div>
 
             <!-- Notas -->
