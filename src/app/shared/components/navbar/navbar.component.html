@@ -1,0 +1,85 @@
+<!-- Navbar fijo: transparente en el hero, sólido con sombra al hacer scroll -->
+<nav
+  class="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+  [class.bg-cream]="isScrolled()"
+  [class.shadow-md]="isScrolled()"
+  [class.bg-transparent]="!isScrolled()">
+
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+    <!-- Logo -->
+    <a href="/" class="font-serif text-2xl font-semibold"
+      [class.text-white]="!isScrolled()"
+      [class.text-charcoal]="isScrolled()">
+      Lumière
+    </a>
+
+    <!-- Links de navegación — desktop -->
+    <ul class="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide">
+      @for (link of navLinks; track link.label) {
+        <li>
+          <a
+            [href]="link.href"
+            class="transition-colors duration-300 hover:text-gold"
+            [class.text-white]="!isScrolled()"
+            [class.text-warm-gray]="isScrolled()">
+            {{ link.label }}
+          </a>
+        </li>
+      }
+    </ul>
+
+    <!-- Botón reservar — desktop -->
+    <a
+      href="/reservations"
+      class="hidden md:inline-block px-5 py-2 text-sm font-medium tracking-wide
+             border transition-colors duration-300"
+      [class.border-white]="!isScrolled()"
+      [class.text-white]="!isScrolled()"
+      [class.hover:bg-white]="!isScrolled()"
+      [class.border-gold]="isScrolled()"
+      [class.text-gold]="isScrolled()"
+      [class.hover:bg-gold]="isScrolled()"
+      [class.hover:text-white]="isScrolled()">
+      Reservar
+    </a>
+
+    <!-- Botón hamburguesa — móvil -->
+    <button
+      class="md:hidden flex flex-col gap-1.5 p-1"
+      (click)="toggleMenu()"
+      aria-label="Abrir menú">
+      <span class="block w-6 h-0.5 transition-colors duration-300"
+        [class.bg-white]="!isScrolled()"
+        [class.bg-charcoal]="isScrolled()"></span>
+      <span class="block w-6 h-0.5 transition-colors duration-300"
+        [class.bg-white]="!isScrolled()"
+        [class.bg-charcoal]="isScrolled()"></span>
+      <span class="block w-6 h-0.5 transition-colors duration-300"
+        [class.bg-white]="!isScrolled()"
+        [class.bg-charcoal]="isScrolled()"></span>
+    </button>
+  </div>
+
+  <!-- Menú móvil desplegable -->
+  @if (isMenuOpen()) {
+    <div class="md:hidden bg-cream px-6 py-4 flex flex-col gap-4 shadow-md">
+      @for (link of navLinks; track link.label) {
+        <a
+          [href]="link.href"
+          class="text-warm-gray hover:text-gold text-sm font-medium tracking-wide transition-colors"
+          (click)="closeMenu()">
+          {{ link.label }}
+        </a>
+      }
+      <a
+        href="/reservations"
+        class="mt-2 px-5 py-2 text-sm font-medium text-center border border-gold text-gold
+               hover:bg-gold hover:text-white transition-colors duration-300"
+        (click)="closeMenu()">
+        Reservar
+      </a>
+    </div>
+  }
+
+</nav>

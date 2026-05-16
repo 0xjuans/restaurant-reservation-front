@@ -14,7 +14,7 @@ SPA desarrollada en **Angular 19** que consume la API REST del sistema de reserv
 - Node.js 18+
 - npm 9+
 - Angular CLI: `npm install -g @angular/cli`
-- Backend corriendo ([restaurant-reservation-apiu](https://github.com/juans.quintoh/restaurant-reservation-apiu))
+- Backend corriendo ([restaurant-reservation-apiu](https://github.com/0xjuans/restaurant-reservation-apiu))
 
 ## Instalación
 

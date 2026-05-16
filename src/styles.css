@@ -1,0 +1,21 @@
+/* Fuentes de Google: Playfair Display (títulos) + Inter (cuerpo) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+/* Tailwind CSS v3 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos base globales */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #FAFAF7;
+    color: #1A1A1A;
+    -webkit-font-smoothing: antialiased;
+  }
+}

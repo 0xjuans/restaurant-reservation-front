@@ -1,0 +1,310 @@
+<!-- Landing page completa de Lumière -->
+<app-navbar />
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- HERO — Video de fondo con overlay y llamada a acción -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section class="relative h-screen overflow-hidden">
+
+  <!-- Video de fondo en loop silencioso -->
+  <video
+    class="absolute inset-0 w-full h-full object-cover"
+    autoplay
+    muted
+    loop
+    playsinline
+    aria-hidden="true">
+    <source src="assets/videos/hero-bg.mp4" type="video/mp4" />
+  </video>
+
+  <!-- Overlay oscuro para legibilidad del texto -->
+  <div class="absolute inset-0 bg-black bg-opacity-55"></div>
+
+  <!-- Contenido centrado sobre el video -->
+  <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+
+    <!-- Etiqueta superior -->
+    <span class="text-gold uppercase tracking-widest text-sm font-light mb-4">
+      Bienvenidos a
+    </span>
+
+    <!-- Nombre del restaurante -->
+    <h1 class="font-serif text-white text-7xl md:text-8xl font-semibold mb-4 drop-shadow-lg">
+      Lumière
+    </h1>
+
+    <!-- Tagline -->
+    <p class="text-white text-opacity-80 text-lg md:text-xl font-light max-w-md mb-10 leading-relaxed">
+      Una experiencia gastronómica donde cada plato cuenta una historia
+    </p>
+
+    <!-- Botones CTA -->
+    <div class="flex flex-col sm:flex-row gap-4">
+      <a
+        href="/reservations"
+        class="px-8 py-3 bg-gold text-white font-medium tracking-wide
+               hover:bg-gold-dark transition-colors duration-300 rounded-sm">
+        Reservar Mesa
+      </a>
+      <a
+        href="#menu"
+        class="px-8 py-3 border border-white text-white font-medium tracking-wide
+               hover:bg-white hover:text-charcoal transition-colors duration-300 rounded-sm">
+        Ver Menú
+      </a>
+    </div>
+  </div>
+
+  <!-- Flecha de scroll -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-10">
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- MENÚ — Tres platos destacados de la carta          -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="menu" class="bg-cream-dark py-24 px-6">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- Encabezado de sección -->
+    <div class="text-center mb-16">
+      <span class="text-gold uppercase tracking-widest text-xs font-medium">
+        Lo mejor de nuestra carta
+      </span>
+      <h2 class="font-serif text-4xl md:text-5xl text-charcoal mt-4 leading-tight">
+        Nuestros Platos
+      </h2>
+      <div class="w-12 h-0.5 bg-gold mx-auto mt-6"></div>
+    </div>
+
+    <!-- Grid de platos -->
+    <div class="grid md:grid-cols-3 gap-8">
+
+      @for (dish of dishes; track dish.name) {
+        <div class="group bg-cream overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
+
+          <!-- Imagen del plato -->
+          <div class="overflow-hidden h-64">
+            <img
+              [src]="dish.image"
+              [alt]="dish.name"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+          </div>
+
+          <!-- Info del plato -->
+          <div class="p-6">
+            <span class="text-gold text-xs uppercase tracking-widest">{{ dish.category }}</span>
+            <h3 class="font-serif text-xl text-charcoal mt-2 mb-3">{{ dish.name }}</h3>
+            <p class="text-warm-gray text-sm leading-relaxed mb-4">{{ dish.description }}</p>
+            <span class="font-serif text-gold text-lg font-semibold">{{ dish.price }}</span>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <!-- Ver menú completo -->
+    <div class="text-center mt-12">
+      <a
+        href="#"
+        class="inline-block px-10 py-3 border border-charcoal text-charcoal text-sm
+               font-medium tracking-wide hover:bg-charcoal hover:text-white
+               transition-colors duration-300">
+        Ver menú completo
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- RESERVA — Banner CTA con imagen de fondo           -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section
+  class="relative py-32 px-6 bg-cover bg-center bg-fixed"
+  style="background-image: url('assets/images/about.jpg')">
+
+  <!-- Overlay oscuro -->
+  <div class="absolute inset-0 bg-black bg-opacity-65"></div>
+
+  <!-- Contenido centrado -->
+  <div class="relative z-10 max-w-2xl mx-auto text-center">
+
+    <span class="text-gold uppercase tracking-widest text-xs font-medium">
+      Haz tu reserva
+    </span>
+
+    <h2 class="font-serif text-4xl md:text-5xl text-white mt-4 mb-6 leading-tight">
+      Una mesa para un momento inolvidable
+    </h2>
+
+    <p class="text-white text-opacity-75 text-base leading-relaxed mb-10">
+      Reserva con anticipación y asegura tu lugar en Lumière.
+      Disponemos de espacios para parejas, familias y eventos privados.
+    </p>
+
+    <a
+      href="/reservations"
+      class="inline-block px-12 py-4 bg-gold text-white text-sm font-medium
+             tracking-widest uppercase hover:bg-gold-dark transition-colors duration-300">
+      Reservar ahora
+    </a>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- NOSOTROS — Historia del restaurante con imagen      -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="about" class="bg-cream py-24 px-6">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+
+    <!-- Texto -->
+    <div>
+      <!-- Etiqueta superior dorada -->
+      <span class="text-gold uppercase tracking-widest text-xs font-medium">
+        Nuestra Historia
+      </span>
+
+      <!-- Título -->
+      <h2 class="font-serif text-4xl md:text-5xl text-charcoal mt-4 mb-6 leading-tight">
+        Donde la pasión<br/>se convierte en arte
+      </h2>
+
+      <!-- Línea decorativa dorada -->
+      <div class="w-12 h-0.5 bg-gold mb-8"></div>
+
+      <!-- Párrafos -->
+      <p class="text-warm-gray leading-relaxed mb-5">
+        Lumière nació del sueño de reunir sabores del mundo en un solo lugar.
+        Desde nuestros inicios, cada plato ha sido concebido como una obra de arte:
+        ingredientes frescos, técnicas clásicas y una pizca de creatividad que
+        sorprende en cada visita.
+      </p>
+      <p class="text-warm-gray leading-relaxed mb-10">
+        Nuestro equipo de chefs recorre mercados locales cada mañana para garantizar
+        que lo que llega a tu mesa sea siempre lo mejor de la temporada.
+        En Lumière, comer bien es solo el comienzo.
+      </p>
+
+      <!-- CTA secundario -->
+      <a
+        href="#menu"
+        class="inline-flex items-center gap-2 text-gold font-medium tracking-wide
+               hover:gap-4 transition-all duration-300">
+        Explorar el menú
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Imagen -->
+    <div class="relative">
+      <!-- Imagen principal -->
+      <img
+        src="assets/images/about.jpg"
+        alt="Interior del restaurante Lumière"
+        class="w-full h-[500px] object-cover shadow-xl"/>
+
+      <!-- Tarjeta flotante con dato destacado -->
+      <div class="absolute -bottom-6 -left-6 bg-white px-8 py-6 shadow-lg">
+        <span class="font-serif text-4xl text-gold font-semibold">10+</span>
+        <p class="text-warm-gray text-sm mt-1">Años de experiencia</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- FOOTER — Logo, links, horarios y redes sociales    -->
+<!-- ═══════════════════════════════════════════════════ -->
+<footer class="bg-charcoal text-white py-16 px-6">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-4 gap-12">
+
+    <!-- Columna 1: Logo y descripción -->
+    <div class="md:col-span-1">
+      <h3 class="font-serif text-2xl text-white mb-4">Lumière</h3>
+      <div class="w-8 h-0.5 bg-gold mb-4"></div>
+      <p class="text-warm-gray text-sm leading-relaxed">
+        Una experiencia gastronómica única en el corazón de la ciudad.
+      </p>
+    </div>
+
+    <!-- Columna 2: Navegación -->
+    <div>
+      <h4 class="text-xs uppercase tracking-widest text-gold mb-5">Navegación</h4>
+      <ul class="space-y-3">
+        @for (link of footerLinks; track link.label) {
+          <li>
+            <a [href]="link.href"
+               class="text-warm-gray text-sm hover:text-white transition-colors duration-300">
+              {{ link.label }}
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <!-- Columna 3: Horarios -->
+    <div>
+      <h4 class="text-xs uppercase tracking-widest text-gold mb-5">Horarios</h4>
+      <ul class="space-y-3 text-sm text-warm-gray">
+        <li class="flex justify-between gap-4">
+          <span>Lunes – Viernes</span>
+          <span>12:00 – 22:00</span>
+        </li>
+        <li class="flex justify-between gap-4">
+          <span>Sábado</span>
+          <span>12:00 – 23:00</span>
+        </li>
+        <li class="flex justify-between gap-4">
+          <span>Domingo</span>
+          <span>12:00 – 21:00</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Columna 4: Contacto y redes -->
+    <div>
+      <h4 class="text-xs uppercase tracking-widest text-gold mb-5">Contacto</h4>
+      <ul class="space-y-3 text-sm text-warm-gray">
+        <li>Calle 123 #45-67, Bogotá</li>
+        <li>+57 300 123 4567</li>
+        <li>hola&#64;lumiere.com</li>
+      </ul>
+
+      <!-- Redes sociales -->
+      <div class="flex gap-4 mt-6">
+        <a href="#" aria-label="Instagram"
+           class="text-warm-gray hover:text-gold transition-colors duration-300">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+          </svg>
+        </a>
+        <a href="#" aria-label="Facebook"
+           class="text-warm-gray hover:text-gold transition-colors duration-300">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Línea divisora y copyright -->
+  <div class="max-w-6xl mx-auto mt-12 pt-8 border-t border-white border-opacity-10
+              flex flex-col md:flex-row justify-between items-center gap-4">
+    <p class="text-warm-gray text-xs">
+      © 2026 Lumière. Todos los derechos reservados.
+    </p>
+  </div>
+
+</footer>
