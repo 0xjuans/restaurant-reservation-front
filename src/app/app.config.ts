@@ -1,15 +1,16 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 
 import { routes } from './app.routes';
+import { jwtInterceptor }   from './core/interceptors/jwt.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    // Habilita HttpClient en toda la aplicación
-    provideHttpClient(withInterceptors([jwtInterceptor])),
+    // El orden importa: jwt adjunta el token, error captura la respuesta
+    provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor])),
   ],
 };
