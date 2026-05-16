@@ -12,6 +12,11 @@ export class CustomerService {
   private readonly http = inject(HttpClient);
   private readonly base = `${environment.apiUrl}/customers`;
 
+  // Lista todos los clientes (solo admin)
+  getAll(): Observable<CustomerResponse[]> {
+    return this.http.get<CustomerResponse[]>(this.base);
+  }
+
   // Obtiene el perfil del cliente autenticado
   getProfile(): Observable<CustomerResponse> {
     return this.http.get<CustomerResponse>(`${this.base}/profile`);

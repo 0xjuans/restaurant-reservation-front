@@ -1,0 +1,108 @@
+<!-- Dashboard del panel admin -->
+<div class="p-8">
+
+  <!-- Encabezado -->
+  <div class="mb-8">
+    <span class="text-gold uppercase tracking-widest text-xs font-medium">Panel de control</span>
+    <h1 class="font-serif text-3xl text-charcoal mt-1">Dashboard</h1>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center py-24">
+      <svg class="w-8 h-8 animate-spin text-gold" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+    </div>
+  }
+
+  @if (!isLoading()) {
+
+    <!-- Tarjetas de estadísticas -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+
+      <!-- Total reservaciones -->
+      <div class="bg-white shadow-sm p-6">
+        <p class="text-xs uppercase tracking-widest text-warm-gray mb-3">Total reservas</p>
+        <p class="font-serif text-4xl text-charcoal">{{ stats().totalReservations }}</p>
+        <div class="mt-4 flex flex-col gap-1 text-xs text-warm-gray">
+          <span>{{ stats().pending }} pendientes</span>
+          <span>{{ stats().confirmed }} confirmadas</span>
+        </div>
+      </div>
+
+      <!-- Mesas -->
+      <div class="bg-white shadow-sm p-6">
+        <p class="text-xs uppercase tracking-widest text-warm-gray mb-3">Mesas</p>
+        <p class="font-serif text-4xl text-charcoal">{{ stats().totalTables }}</p>
+        <div class="mt-4 text-xs text-warm-gray">
+          <span>{{ stats().availableTables }} disponibles ahora</span>
+        </div>
+      </div>
+
+      <!-- Clientes -->
+      <div class="bg-white shadow-sm p-6">
+        <p class="text-xs uppercase tracking-widest text-warm-gray mb-3">Clientes</p>
+        <p class="font-serif text-4xl text-charcoal">{{ stats().totalCustomers }}</p>
+        <div class="mt-4 text-xs text-warm-gray">
+          <span>Perfiles registrados</span>
+        </div>
+      </div>
+
+      <!-- Completadas -->
+      <div class="bg-white shadow-sm p-6">
+        <p class="text-xs uppercase tracking-widest text-warm-gray mb-3">Completadas</p>
+        <p class="font-serif text-4xl text-charcoal">{{ stats().completed }}</p>
+        <div class="mt-4 text-xs text-warm-gray">
+          <span>{{ stats().cancelled }} canceladas</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Últimas reservaciones -->
+    <div class="bg-white shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h2 class="font-serif text-lg text-charcoal">Últimas reservaciones</h2>
+        <a href="/admin/reservaciones"
+          class="text-xs text-gold hover:text-gold-dark transition-colors tracking-wide">
+          Ver todas →
+        </a>
+      </div>
+
+      @if (recentReservations().length === 0) {
+        <p class="text-center text-warm-gray text-sm py-12">No hay reservaciones aún.</p>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Cliente</th>
+                <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Mesa</th>
+                <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Fecha</th>
+                <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Horario</th>
+                <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of recentReservations(); track r.id) {
+                <tr class="border-b border-gray-50 hover:bg-cream transition-colors">
+                  <td class="px-6 py-4 text-charcoal">{{ r.customerName }}</td>
+                  <td class="px-6 py-4 text-warm-gray">Mesa {{ r.tableNumber }} — {{ r.tableZoneName }}</td>
+                  <td class="px-6 py-4 text-warm-gray">{{ r.date }}</td>
+                  <td class="px-6 py-4 text-warm-gray">{{ r.startTime }} – {{ r.endTime }}</td>
+                  <td class="px-6 py-4">
+                    <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ statusClass(r.status) }}">
+                      {{ statusLabel(r.status) }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+  }
+</div>

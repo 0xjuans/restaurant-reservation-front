@@ -1,0 +1,114 @@
+<!-- Gestión de reservaciones — panel admin -->
+<div class="p-8">
+
+  <!-- Encabezado -->
+  <div class="mb-8 flex items-end justify-between">
+    <div>
+      <span class="text-gold uppercase tracking-widest text-xs font-medium">Administración</span>
+      <h1 class="font-serif text-3xl text-charcoal mt-1">Reservaciones</h1>
+    </div>
+    <!-- Total visible -->
+    <p class="text-sm text-warm-gray">
+      {{ filtered().length }} de {{ allReservations().length }} reservas
+    </p>
+  </div>
+
+  <!-- Filtros por estado -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    @for (opt of statusOptions; track opt.value) {
+      <button
+        (click)="filterStatus.set(opt.value)"
+        class="px-4 py-1.5 text-xs font-medium tracking-wide border transition-colors duration-200"
+        [class.bg-charcoal]="filterStatus() === opt.value"
+        [class.text-white]="filterStatus() === opt.value"
+        [class.border-charcoal]="filterStatus() === opt.value"
+        [class.text-warm-gray]="filterStatus() !== opt.value"
+        [class.border-gray-200]="filterStatus() !== opt.value"
+        [class.hover:border-charcoal]="filterStatus() !== opt.value">
+        {{ opt.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Tabla -->
+  @if (isLoading()) {
+    <div class="flex justify-center py-24">
+      <svg class="w-8 h-8 animate-spin text-gold" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+      </svg>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="bg-white shadow-sm text-center py-16 text-warm-gray">
+      <p class="font-serif text-xl">No hay reservaciones</p>
+      <p class="text-sm mt-1">Cambia el filtro para ver otras.</p>
+    </div>
+  } @else {
+    <div class="bg-white shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100 bg-cream">
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">#</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Cliente</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Mesa</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Fecha</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Horario</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Personas</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Estado</th>
+              <th class="text-left px-6 py-3 text-xs uppercase tracking-widest text-warm-gray font-medium">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of filtered(); track r.id) {
+              <tr class="border-b border-gray-50 hover:bg-cream transition-colors"
+                [class.opacity-50]="updatingId() === r.id">
+                <td class="px-6 py-4 text-warm-gray text-xs">{{ r.id }}</td>
+                <td class="px-6 py-4 text-charcoal font-medium">{{ r.customerName }}</td>
+                <td class="px-6 py-4 text-warm-gray">Mesa {{ r.tableNumber }}<br/>
+                  <span class="text-xs">{{ r.tableZoneName }}</span>
+                </td>
+                <td class="px-6 py-4 text-warm-gray">{{ r.date }}</td>
+                <td class="px-6 py-4 text-warm-gray">{{ r.startTime }} – {{ r.endTime }}</td>
+                <td class="px-6 py-4 text-warm-gray text-center">{{ r.guestsCount }}</td>
+                <td class="px-6 py-4">
+                  <span class="px-2 py-0.5 text-xs font-medium rounded-full {{ statusClass(r.status) }}">
+                    {{ statusLabel(r.status) }}
+                  </span>
+                </td>
+                <!-- Acciones según estado actual -->
+                <td class="px-6 py-4">
+                  <div class="flex gap-2">
+                    @if (r.status === 'PENDING') {
+                      <button (click)="changeStatus(r.id, 'CONFIRMED')"
+                        class="px-3 py-1 text-xs bg-green-600 text-white hover:bg-green-700 transition-colors">
+                        Confirmar
+                      </button>
+                      <button (click)="changeStatus(r.id, 'CANCELLED')"
+                        class="px-3 py-1 text-xs border border-red-300 text-red-500 hover:bg-red-50 transition-colors">
+                        Cancelar
+                      </button>
+                    }
+                    @if (r.status === 'CONFIRMED') {
+                      <button (click)="changeStatus(r.id, 'COMPLETED')"
+                        class="px-3 py-1 text-xs bg-charcoal text-white hover:bg-gold transition-colors">
+                        Completar
+                      </button>
+                      <button (click)="changeStatus(r.id, 'CANCELLED')"
+                        class="px-3 py-1 text-xs border border-red-300 text-red-500 hover:bg-red-50 transition-colors">
+                        Cancelar
+                      </button>
+                    }
+                    @if (r.status === 'CANCELLED' || r.status === 'COMPLETED') {
+                      <span class="text-xs text-warm-gray italic">Sin acciones</span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

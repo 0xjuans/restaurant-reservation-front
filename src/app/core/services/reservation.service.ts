@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { ReservationRequest, ReservationResponse } from '../models/reservation.model';
+import { ReservationRequest, ReservationResponse, ReservationStatus } from '../models/reservation.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReservationService {
@@ -32,5 +32,10 @@ export class ReservationService {
     return this.http.patch<ReservationResponse>(`${this.base}/${id}/status`, {
       status: 'CANCELLED',
     });
+  }
+
+  // Actualiza el estado de una reserva (para administradores)
+  updateStatus(id: number, status: ReservationStatus): Observable<ReservationResponse> {
+    return this.http.patch<ReservationResponse>(`${this.base}/${id}/status`, { status });
   }
 }
