@@ -1,0 +1,238 @@
+<!-- Página de registro: imagen a la izquierda, formulario a la derecha -->
+<div class="min-h-screen flex">
+
+  <!-- Panel izquierdo — imagen de ambiente -->
+  <div class="hidden lg:block lg:w-1/2 relative">
+    <img
+      src="assets/images/about.jpg"
+      alt="Interior Lumière"
+      class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-end p-12">
+      <h1 class="font-serif text-5xl text-white mb-3">Lumière</h1>
+      <p class="text-white text-opacity-70 text-base max-w-xs leading-relaxed">
+        Únete y disfruta de reservas exclusivas y experiencias únicas.
+      </p>
+    </div>
+  </div>
+
+  <!-- Panel derecho — formulario -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center bg-cream px-6 py-12">
+    <div class="w-full max-w-md">
+
+      <!-- Logo móvil -->
+      <a href="/" class="block lg:hidden font-serif text-3xl text-charcoal text-center mb-10">
+        Lumière
+      </a>
+
+      <!-- Encabezado -->
+      <div class="mb-8">
+        <span class="text-gold uppercase tracking-widest text-xs font-medium">
+          Crea tu cuenta
+        </span>
+        <h2 class="font-serif text-3xl text-charcoal mt-2">
+          Registro
+        </h2>
+        <div class="w-8 h-0.5 bg-gold mt-4"></div>
+      </div>
+
+      <!-- Mensaje de error global -->
+      @if (errorMsg()) {
+        <div class="mb-6 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-sm">
+          {{ errorMsg() }}
+        </div>
+      }
+
+      <!-- Formulario -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="space-y-4">
+
+        <!-- Nombre y apellido en fila -->
+        <div class="grid grid-cols-2 gap-4">
+
+          <!-- Nombre -->
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+              Nombre
+            </label>
+            <input
+              type="text"
+              formControlName="firstName"
+              placeholder="Juan"
+              class="w-full px-4 py-3 bg-white border text-charcoal text-sm
+                     focus:outline-none focus:border-gold transition-colors duration-200
+                     placeholder:text-warm-gray placeholder:text-opacity-60"
+              [class.border-red-400]="firstName.invalid && firstName.touched"
+              [class.border-gray-200]="!(firstName.invalid && firstName.touched)"/>
+            @if (firstName.invalid && firstName.touched) {
+              <p class="mt-1 text-xs text-red-500">Mínimo 2 caracteres.</p>
+            }
+          </div>
+
+          <!-- Apellido -->
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+              Apellido
+            </label>
+            <input
+              type="text"
+              formControlName="lastName"
+              placeholder="Pérez"
+              class="w-full px-4 py-3 bg-white border text-charcoal text-sm
+                     focus:outline-none focus:border-gold transition-colors duration-200
+                     placeholder:text-warm-gray placeholder:text-opacity-60"
+              [class.border-red-400]="lastName.invalid && lastName.touched"
+              [class.border-gray-200]="!(lastName.invalid && lastName.touched)"/>
+            @if (lastName.invalid && lastName.touched) {
+              <p class="mt-1 text-xs text-red-500">Mínimo 2 caracteres.</p>
+            }
+          </div>
+
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+            Correo electrónico
+          </label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="tu@correo.com"
+            class="w-full px-4 py-3 bg-white border text-charcoal text-sm
+                   focus:outline-none focus:border-gold transition-colors duration-200
+                   placeholder:text-warm-gray placeholder:text-opacity-60"
+            [class.border-red-400]="email.invalid && email.touched"
+            [class.border-gray-200]="!(email.invalid && email.touched)"/>
+          @if (email.invalid && email.touched) {
+            <p class="mt-1 text-xs text-red-500">
+              {{ email.hasError('required') ? 'El correo es obligatorio.' : 'Ingresa un correo válido.' }}
+            </p>
+          }
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+            Teléfono
+          </label>
+          <input
+            type="tel"
+            formControlName="phone"
+            placeholder="+57 300 123 4567"
+            class="w-full px-4 py-3 bg-white border text-charcoal text-sm
+                   focus:outline-none focus:border-gold transition-colors duration-200
+                   placeholder:text-warm-gray placeholder:text-opacity-60"
+            [class.border-red-400]="phone.invalid && phone.touched"
+            [class.border-gray-200]="!(phone.invalid && phone.touched)"/>
+          @if (phone.invalid && phone.touched) {
+            <p class="mt-1 text-xs text-red-500">Ingresa un número de teléfono válido.</p>
+          }
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+            Contraseña
+          </label>
+          <div class="relative">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Mínimo 8 caracteres"
+              class="w-full px-4 py-3 pr-12 bg-white border text-charcoal text-sm
+                     focus:outline-none focus:border-gold transition-colors duration-200
+                     placeholder:text-warm-gray placeholder:text-opacity-60"
+              [class.border-red-400]="password.invalid && password.touched"
+              [class.border-gray-200]="!(password.invalid && password.touched)"/>
+            <!-- Toggle visibilidad -->
+            <button
+              type="button"
+              (click)="showPassword.set(!showPassword())"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray hover:text-charcoal transition-colors">
+              @if (showPassword()) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7
+                       a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878
+                       l4.242 4.242M9.88 9.88L6.59 6.59m7.532 7.532l3.29 3.29M3 3l3.59 3.59
+                       m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7
+                       a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                </svg>
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7
+                       -1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              }
+            </button>
+          </div>
+          @if (password.invalid && password.touched) {
+            <p class="mt-1 text-xs text-red-500">
+              {{ password.hasError('required') ? 'La contraseña es obligatoria.' : 'Mínimo 8 caracteres.' }}
+            </p>
+          }
+        </div>
+
+        <!-- Confirmar contraseña -->
+        <div>
+          <label class="block text-xs uppercase tracking-widest text-warm-gray mb-2">
+            Confirmar contraseña
+          </label>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Repite tu contraseña"
+            class="w-full px-4 py-3 bg-white border text-charcoal text-sm
+                   focus:outline-none focus:border-gold transition-colors duration-200
+                   placeholder:text-warm-gray placeholder:text-opacity-60"
+            [class.border-red-400]="(confirmPassword.touched && form.hasError('passwordMismatch'))"
+            [class.border-gray-200]="!(confirmPassword.touched && form.hasError('passwordMismatch'))"/>
+          @if (confirmPassword.touched && form.hasError('passwordMismatch')) {
+            <p class="mt-1 text-xs text-red-500">Las contraseñas no coinciden.</p>
+          }
+        </div>
+
+        <!-- Botón submit -->
+        <button
+          type="submit"
+          [disabled]="isLoading()"
+          class="w-full py-3 bg-gold text-white text-sm font-medium tracking-widest
+                 uppercase transition-colors duration-300 mt-2
+                 hover:bg-gold-dark disabled:opacity-60 disabled:cursor-not-allowed">
+          @if (isLoading()) {
+            <span class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              Creando cuenta...
+            </span>
+          } @else {
+            Crear cuenta
+          }
+        </button>
+
+      </form>
+
+      <!-- Link a login -->
+      <p class="mt-8 text-center text-sm text-warm-gray">
+        ¿Ya tienes cuenta?
+        <a routerLink="/acceso" class="text-gold font-medium hover:text-gold-dark transition-colors">
+          Inicia sesión
+        </a>
+      </p>
+
+      <!-- Volver al inicio -->
+      <p class="mt-3 text-center">
+        <a href="/" class="text-xs text-warm-gray hover:text-charcoal transition-colors tracking-wide">
+          ← Volver al inicio
+        </a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
